@@ -12,11 +12,11 @@ public class Arrow : MonoBehaviour
 
 
     private Vector3 currentAngle;
-    private float TargetSpeedOfLoading { get; set; } = 150f;
+    private float TargetSpeedOfLoading { get; set; } = 220f;
 
-    private float TargetSpeedUp { get; set; } = -5f;
+    private float TargetSpeedUp { get; set; } = -2f;
     private float SpeedOfIncrease { get; set; } = 0.05f;
-    private float SpeedUpAngle { get; set; } = -5f;
+    private float SpeedUpAngle { get; set; } = -2f;
 
     [SerializeField] private float targetAngle = 270f;
 
@@ -69,7 +69,7 @@ public class Arrow : MonoBehaviour
 
         actualLoadingSpeed = Math.Round(100 - transform.eulerAngles.z * maxSpeed / speedometrAngles, 2, MidpointRounding.ToEven);
             //Math.Ceiling(100 - transform.eulerAngles.z * maxSpeed / speedometrAngles);
-        Debug.Log("actualLoadingSpeed: " + actualLoadingSpeed);
+        //Debug.Log("actualLoadingSpeed: " + actualLoadingSpeed);
     }
 
 
@@ -79,6 +79,7 @@ public class Arrow : MonoBehaviour
         if(IsRotatable) 
         {
             TargetSpeedUp += SpeedUpAngle;
+            targetAngle += -2f;
             SpeedOfIncrease += 0.15f;
         }
 
