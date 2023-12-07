@@ -18,15 +18,15 @@ public class LoadingFile
 
     public void Load(double size)
     {
-        Debug.Log("brfore LoadedSize:" + LoadedSize);
+        //Debug.Log("brfore LoadedSize:" + LoadedSize);
         if (LoadedSize + size > FileSize)
         {
-            Debug.Log("if File loaded");
+            //Debug.Log("if File loaded");
             LoadedSize = FileSize;
             //start event
             OnFileLoaded?.Invoke(this, EventArgs.Empty);
         }
         else LoadedSize += (float) size;
-        Debug.Log("arter LoadedSize:" + LoadedSize);
+        //Debug.Log("arter LoadedSize:" + LoadedSize);
     }
 }

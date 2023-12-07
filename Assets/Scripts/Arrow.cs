@@ -2,28 +2,32 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class Arrow : MonoBehaviour
 {
-   
-    private bool IsRotatable;
     private bool IsLoadingEnded;
+    public bool CanClick;
 
-
+    public bool CanDecrise = true;
     private Vector3 currentAngle;
-    private float TargetSpeedOfLoading { get; set; } = 220f;
+    //то значение к которому стрелка движется
+    public float TargetSpeedOfLoading { get; set; } = 220f;
+    //то на сколько градусов в единицу времени приближжается стрелка к TargetSpeedOfLoading
+    public float TargetSpeedUp { get; set; } = -2f;
 
-    private float TargetSpeedUp { get; set; } = -2f;
-    private float SpeedOfIncrease { get; set; } = 0.05f;
-    private float SpeedUpAngle { get; set; } = -2f;
+    //то на сколько увеличивается угол при клике мышкой
+    public float SpeedUpAngle { get; set; } = -2f;
+    public float loadindDecreseCof = 20f;
 
     [SerializeField] private float targetAngle = 270f;
 
+   
     public double actualLoadingSpeed;
     private void Start()
     {
-        IsRotatable = true;
+        CanClick = true;
         IsLoadingEnded = false;
         currentAngle = transform.eulerAngles;
     }
@@ -31,44 +35,64 @@ public class Arrow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (transform.eulerAngles.z < 2f && transform.eulerAngles.z > 0f)
         {
             transform.eulerAngles = new Vector3(currentAngle.x, currentAngle.y, 0f);
-            IsRotatable = false;
+            CanDecrise = true;
         }
-        //if (transform.eulerAngles.z > 270f)
-        //{
-        //    IsRotatable = false;
-        //}
 
-        if (IsRotatable)
+        if (targetAngle > TargetSpeedOfLoading)
         {
-            if(targetAngle > TargetSpeedOfLoading)
-            {
-                targetAngle += TargetSpeedUp;
-            }
-            
-            currentAngle = new Vector3(currentAngle.x, currentAngle.y,
-                Mathf.LerpAngle(currentAngle.z, targetAngle, SpeedOfIncrease * Time.deltaTime));
-
-            transform.eulerAngles = currentAngle;
-
-            Debug.Log("angles: " + transform.eulerAngles.z);
+            targetAngle += TargetSpeedUp;
         }
+
+        if (currentAngle.z > 245)
+        {
+            CanDecrise = false;
+        }
+        if (currentAngle.z < 245f)
+        {
+            CanDecrise = true;
+        }
+        float zRotation = Mathf.Clamp(Mathf.LerpAngle(currentAngle.z, targetAngle, Time.deltaTime), 0f, 270f);
+        currentAngle = new Vector3(currentAngle.x, currentAngle.y,
+            zRotation);
+        //при достижеии определенного значения скорость начинает падать
+        float maxSpeedWithoutDecr = 245f;
+        if (CanDecrise && transform.eulerAngles.z < maxSpeedWithoutDecr)
+        {
+            LoadingDecrease();
+        }
+
+        if (transform.eulerAngles.z > maxSpeedWithoutDecr)
+        {
+            TargetSpeedOfLoading = 250f;
+            TargetSpeedUp = -2f;
+        }
+
+        if (currentAngle.z < 270 && currentAngle.z > 0)
+        {
+            transform.eulerAngles = currentAngle;
+        }
+
+        //Debug.Log("angles: " + transform.eulerAngles.z);
+
 
         if (IsLoadingEnded)
         {
             currentAngle = new Vector3(currentAngle.x, currentAngle.y,
-                Mathf.LerpAngle(currentAngle.z, targetAngle, SpeedOfIncrease * Time.deltaTime));
+                Mathf.LerpAngle(currentAngle.z, targetAngle, Time.deltaTime));
 
             transform.eulerAngles = currentAngle;
         }
+        Debug.Log("currentangle: " + currentAngle.z);
 
         float maxSpeed = 100f;
         float speedometrAngles = 270;
 
         actualLoadingSpeed = Math.Round(100 - transform.eulerAngles.z * maxSpeed / speedometrAngles, 2, MidpointRounding.ToEven);
-            //Math.Ceiling(100 - transform.eulerAngles.z * maxSpeed / speedometrAngles);
+        //Math.Ceiling(100 - transform.eulerAngles.z * maxSpeed / speedometrAngles);
         //Debug.Log("actualLoadingSpeed: " + actualLoadingSpeed);
     }
 
@@ -76,23 +100,36 @@ public class Arrow : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if(IsRotatable) 
+        Debug.Log("OnMouseDown");
+        if (CanClick) 
         {
             TargetSpeedUp += SpeedUpAngle;
-            targetAngle += -2f;
-            SpeedOfIncrease += 0.15f;
+            targetAngle += SpeedUpAngle;
         }
 
         //targetAngle = currentAngle.z + Speed;
     }
 
+    private void LoadingDecrease()
+    {
+        Debug.Log("LoadingDecrease");
+
+       TargetSpeedUp -= SpeedUpAngle/ loadindDecreseCof;
+       targetAngle -= SpeedUpAngle/ loadindDecreseCof;
+
+
+    }
+
     public void StopLoading()
     {
-        IsRotatable = false;
         targetAngle = 270f;
-        SpeedOfIncrease = 5f;
         IsLoadingEnded = true;
 
+    }
+
+    public void IncreaseAngle(float angle)
+    {
+        targetAngle += angle;
     }
 
 }
