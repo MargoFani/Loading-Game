@@ -86,7 +86,7 @@ public class Arrow : MonoBehaviour
 
             transform.eulerAngles = currentAngle;
         }
-        Debug.Log("currentangle: " + currentAngle.z);
+        //Debug.Log("currentangle: " + currentAngle.z);
 
         float maxSpeed = 100f;
         float speedometrAngles = 270;

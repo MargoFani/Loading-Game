@@ -1,9 +1,12 @@
+using Assets.Scripts;
+using Assets.Scripts.Collections;
 using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -34,7 +37,10 @@ public class Game : MonoBehaviour
     private int allLoadedSize = 0;
 
     [SerializeField] private AudioSource fileLoadedSound;
+    [SerializeField] private PopUpSystem popUpSystem;
 
+    [SerializeField] private List<float> downloadedFiles = new List<float>();
+    [SerializeField] private AllCollections allCollections;
     void Start()
     {
         //PlayerPoints = 1450;
@@ -47,7 +53,11 @@ public class Game : MonoBehaviour
         loadingBar.minValue = 0;
         loadingBar.maxValue = loadingFile.FileSize;
         allLoadedFilesText.text = allLoadedFiles.ToString();
-        
+
+        popUpSystem.OnPopUpClose += Continue_OnPopUpClose;
+        popUpSystem.OnPopUpFileSave += Continue_OnFileSave;
+
+        allCollections.Init();
     }
 
     // Update is called once per frame
@@ -85,18 +95,30 @@ public class Game : MonoBehaviour
         fileLoadedSound.Play();
         Debug.Log("File loaded");
         IsLoading = false;
-        allLoadedSize += (int) loadingFile.FileSize;
-        int pointsPerDownloadedSize = 50;
-        int downloadedSize = 300;
-        if (allLoadedSize - downloadedSize > 0)
-        {
-            do
-            {
-                PlayerPoints += pointsPerDownloadedSize;
-                allLoadedSize -= downloadedSize;
+        allLoadedFiles++;
+        popUpSystem.PopUp();
+    }
 
-            } while (allLoadedSize - downloadedSize > 0);
-        }
+    private void Continue_OnFileSave(object sender, EventArgs e)
+    {
+        System.Random rnd = new System.Random();
+        int randomMemId = rnd.Next(0, 25);
+        allCollections.mems[randomMemId].isSaved = true;
+
+        Debug.Log("loadingFile.FileSize " + loadingFile.FileSize);
+        Debug.Log($"mem id {randomMemId}, rarity {allCollections.mems[randomMemId].rarity}");
+        downloadedFiles.Add(loadingFile.FileSize);
+
+        CountPoints();
+        CreateNewLoadingFile();
+    }
+    private void Continue_OnPopUpClose(object sender, EventArgs e)
+    {
+        CountPoints();
+        CreateNewLoadingFile();
+    }
+    private void CreateNewLoadingFile()
+    {
         System.Random rnd = new System.Random();
         int value = rnd.Next(46, 1024);
         loadingFile = new LoadingFile(value);
@@ -107,13 +129,25 @@ public class Game : MonoBehaviour
         loadingBar.maxValue = loadingFile.FileSize;
         //speedometrArrow.StopLoading();
         IsLoading = true;
-
-        allLoadedFiles++;
         allLoadedFilesText.text = allLoadedFiles.ToString();
-
-       
     }
+    private void CountPoints()
+    {
+        allLoadedSize += (int)loadingFile.FileSize;
 
+        int pointsPerDownloadedSize = 50;
+        int downloadedSize = 300;
+
+        if (allLoadedSize - downloadedSize > 0)
+        {
+            do
+            {
+                PlayerPoints += pointsPerDownloadedSize;
+                allLoadedSize -= downloadedSize;
+
+            } while (allLoadedSize - downloadedSize > 0);
+        }
+    }
     public void SetEffectInfo(Sprite effectIcon, string description)
     {
         effectImage.enabled = true;
