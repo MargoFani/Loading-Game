@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a61f2546b3ef15d4d87631303b5ff802, type: 3}
+  m_Name: CoffeData
+  m_EditorClassIdentifier: 
+  _price: 350
+  _name: "\u043A\u043E\u0444\u0435"
+  _itemEffects:
+  - {fileID: 11400000, guid: 80ef72dd6032dc14881972738d7de035, type: 2}
+  - {fileID: 11400000, guid: b167d34f1759a9747bc723ba0297ec80, type: 2}

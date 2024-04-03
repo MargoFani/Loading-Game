@@ -22,8 +22,8 @@ public class Arrow : MonoBehaviour
     public float loadindDecreseCof = 20f;
 
     [SerializeField] private float targetAngle = 270f;
-
-   
+    //скорость при достижении которой, скорость больше не уменьшается
+    float maxSpeedWithoutDecr = 245f;
     public double actualLoadingSpeed;
     private void Start()
     {
@@ -47,19 +47,19 @@ public class Arrow : MonoBehaviour
             targetAngle += TargetSpeedUp;
         }
 
-        if (currentAngle.z > 245)
-        {
-            CanDecrise = false;
-        }
-        if (currentAngle.z < 245f)
+        if (currentAngle.z < maxSpeedWithoutDecr)
         {
             CanDecrise = true;
+        }
+        if (currentAngle.z > maxSpeedWithoutDecr)
+        {
+            CanDecrise = false;
         }
         float zRotation = Mathf.Clamp(Mathf.LerpAngle(currentAngle.z, targetAngle, Time.deltaTime), 0f, 270f);
         currentAngle = new Vector3(currentAngle.x, currentAngle.y,
             zRotation);
         //при достижеии определенного значения скорость начинает падать
-        float maxSpeedWithoutDecr = 245f;
+        
         if (CanDecrise && transform.eulerAngles.z < maxSpeedWithoutDecr)
         {
             LoadingDecrease();
@@ -132,4 +132,8 @@ public class Arrow : MonoBehaviour
         targetAngle += angle;
     }
 
+    public float GetTargetAngle()
+    {
+        return targetAngle;
+    }
 }
